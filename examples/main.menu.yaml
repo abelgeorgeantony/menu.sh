@@ -1,18 +1,13 @@
 #!/usr/bin/env menu.sh
 ---
-ssh:
-  __cmd__: autossh -M 0 -t $1 "/bin/bash -c 'tmux new-session -A -s main'"
-  host1:
-    cmd: host1.full.hostname
-  host2:
-    cmd: host2.full.hostname
-  host3-is-different:
-    run: autossh -M 0 -J proxy-host -t host3.full.hostname "/bin/bash -c 'tmux new-session -A -s main'"
-vpn:
-  roam-start:
-    run: sudo systemctl stop wg-quick@wg0 && sudo systemctl start wg-quick@roam
-  roam-stop:
-    run: sudo systemctl stop wg-quick@roam && sudo systemctl start wg-quick@wg0
+apps:
+  start-x-windows:
+    run: startx
+  ssh-hosts:
+    home:
+      run: ssh me@home.dialup.example
+    work:
+      run: ssh -t my.host.example.org.co '/bin/sh echo I always forget this hostname'
 system:
   shutdown:
     run: sudo shutdown now

@@ -15,6 +15,8 @@ https://github.com/iandennismiller/menu.sh
 
 This example demonstrates a menu containing two sub-menus: apps and system.
 
+![menu.sh demonstration](docs/menu-demo.gif)
+
 ```yaml
 #!/usr/bin/env menu.sh
 ---

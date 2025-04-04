@@ -41,7 +41,7 @@ while true; do
         else
             printf -v OPTIONS "$OPTIONS\n<- quit/back"
         fi
-        CHOICE=$(fzf --height=~75 --margin=5,10 --reverse --border=sharp --prompt="> " --preview="yq '$PREVIEW_PATH.{}' $MENU" --preview-window=down:3:wrap <<< "$OPTIONS")
+        CHOICE=$(fzf --height=~75 --margin=2,10 --reverse --border=sharp --prompt="> " --preview="yq '$PREVIEW_PATH.{}' $MENU" --preview-window=down:3:wrap <<< "$OPTIONS")
     fi
 
     case $CHOICE in
