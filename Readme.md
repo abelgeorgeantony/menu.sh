@@ -11,6 +11,8 @@ Menus are described with YAML and sub-menus are supported.
 
 ### Example
 
+This example demonstrates a menu containing two sub-menus: apps and system.
+
 ```yaml
 #!/usr/bin/env menu.sh
 ---
@@ -27,8 +29,6 @@ system:
   logout:
     run: logout
 ```
-
-This example demonstrates a menu containing two sub-menus: apps and system.
 
 ## Installation
 
@@ -58,6 +58,8 @@ I want a console-based launcher for my cyberdeck, which has a tiny keyboard. I w
 ### Describing a menu item
 
 ```yaml
+#!/usr/bin/env menu.sh
+---
 launch-search-engine:
   run: open yahoo.com.org
 launch-email:
