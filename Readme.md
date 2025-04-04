@@ -62,12 +62,8 @@ I want a console-based launcher for my cyberdeck, which has a tiny keyboard. I w
 ```yaml
 #!/usr/bin/env menu.sh
 ---
-launch-search-engine:
-  run: open yahoo.com.org
-launch-email:
-  run: open my.aol.gov.co
 this-appears-in-menu:
-  run-wait: echo "this command runs when launched"
+  run: echo "this command runs when launched"
 ```
 
 ### Menus can be nested
