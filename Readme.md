@@ -68,22 +68,26 @@ this-appears-in-menu:
 
 ### Menus can be nested
 
+The top-level menu consists of "network" and "system".
+Within the network menu, there are two sub-menus: vpn and ssh.
+
 ```yaml
 #!/usr/bin/env menu.sh
 ---
-ssh:
-  __cmd__: autossh -M 0 -t $1 "/bin/bash -c 'tmux new-session -A -s main'"
-  host1:
-    cmd: host1.full.hostname
-  host2:
-    cmd: host2.full.hostname
-  host3-is-different:
-    run: autossh -M 0 -J proxy-host -t host3.full.hostname "/bin/bash -c 'tmux new-session -A -s main'"
-vpn:
-  roam-start:
-    run: sudo systemctl stop wg-quick@wg0 && sudo systemctl start wg-quick@roam
-  roam-stop:
-    run: sudo systemctl stop wg-quick@roam && sudo systemctl start wg-quick@wg0
+network:
+  vpn:
+    roam-start:
+      run: sudo systemctl stop wg-quick@wg0 && sudo systemctl start wg-quick@roam
+    roam-stop:
+      run: sudo systemctl stop wg-quick@roam && sudo systemctl start wg-quick@wg0
+  ssh:
+    __cmd__: autossh -M 0 -t $1 "/bin/bash -c 'tmux new-session -A -s main'"
+    host1:
+      cmd: host1.full.hostname
+    host2:
+      cmd: host2.full.hostname
+    host3-is-different:
+      run: autossh -M 0 -J proxy-host -t host3.full.hostname "/bin/bash -c 'tmux new-session -A -s main'"
 system:
   shutdown:
     run: sudo shutdown now
