@@ -1,4 +1,8 @@
 #!/bin/bash
+# Ian Dennis Miller
+# https://github.com/iandennismiller/menu.sh
+# menu.sh 0.1
+# 2025-04-04
 
 MENU=$1
 YQ_PATH='.'
