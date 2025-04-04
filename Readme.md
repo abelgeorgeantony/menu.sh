@@ -3,6 +3,8 @@
 `menu.sh` is a lightweight menu and launcher for text-mode consoles.
 Menus are described with YAML and sub-menus are supported.
 
+https://github.com/iandennismiller/menu.sh
+
 ## Quickstart
 
 1. Use `#!/usr/bin/env menu.sh` as the shebang for a YAML file
@@ -33,7 +35,7 @@ system:
 ## Installation
 
 ```bash
-wget https://github.com/iandennismiller/menu.sh/main/menu.sh
+wget https://github.com/iandennismiller/menu.sh/raw/refs/heads/main/menu.sh
 install -C -v ./menu.sh ~/.local/bin/menu.sh
 ```
 
