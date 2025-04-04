@@ -1,0 +1,6 @@
+#!/usr/bin/env menu.sh
+---
+roam-start:
+  run: sudo systemctl stop wg-quick@wg0 && sudo systemctl start wg-quick@roam
+roam-stop:
+  run: sudo systemctl stop wg-quick@roam && sudo systemctl start wg-quick@wg0

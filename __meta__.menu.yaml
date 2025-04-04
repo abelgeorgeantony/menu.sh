@@ -1,0 +1,27 @@
+#!/usr/bin/env menu.sh
+---
+install:
+  run: install -C -v ./menu.sh ~/.local/bin/menu.sh
+requirements:
+  check-if-installed:
+    __cmd__: "[ -z $(which $1) ] && echo $1 is NOT installed || echo $1 is installed"
+    is-yq-installed:
+      cmd: yq
+    is-fzf-installed:
+      cmd: fzf
+  install-requirement:
+    install-yq:
+      run: YQ_VERSION=v4.45.1 YQ_ARCH=linux_amd64 wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_${YQ_ARCH} -O /usr/local/bin/yq && chmod +x /usr/local/bin/yq
+    install-fzf:
+      run: apt install fzf
+examples:
+  quickstart-demo:
+    run: ./menu.sh ./examples/main.menu.yaml
+  using-the-cmd-macro:
+    run: ./menu.sh ./examples/cmd-macro.menu.yaml
+  include-other-menus:
+    run: ./menu.sh ./examples/include-others.menu.yaml
+  a-vpn-menu-example:
+    run: ./menu.sh ./examples/vpn.menu.yaml
+  a-system-menu-example:
+    run: ./menu.sh ./examples/system.menu.yaml

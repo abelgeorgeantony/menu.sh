@@ -1,0 +1,8 @@
+#!/usr/bin/env menu.sh
+---
+shutdown:
+  run: sudo shutdown now
+reboot:
+  run: sudo reboot
+logout:
+  run: logout

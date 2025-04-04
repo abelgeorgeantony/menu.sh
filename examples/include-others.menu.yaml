@@ -1,0 +1,8 @@
+#!/usr/bin/env menu.sh
+---
+ssh:
+  run: ./examples/cmd-macro.menu.yaml
+vpn:
+  run: ./examples/vpn.menu.yaml
+system:
+  run: ./examples/system.menu.yaml

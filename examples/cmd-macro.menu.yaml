@@ -1,0 +1,9 @@
+#!/usr/bin/env menu.sh
+---
+__cmd__: autossh -M 0 -t $1 "/bin/bash -c 'tmux new-session -A -s main'"
+host1:
+  cmd: host1.full.hostname
+host2:
+  cmd: host2.full.hostname
+host3-is-different:
+  run: autossh -M 0 -J proxy-host -t host3.full.hostname "/bin/bash -c 'tmux new-session -A -s main'"
