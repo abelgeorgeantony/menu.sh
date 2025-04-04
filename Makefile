@@ -1,8 +1,8 @@
-run:
-	./menu.sh __meta__.menu.yaml
+menu:
+	./menu.sh ./examples/__meta__.menu.yaml
 
 install:
 	install -C -v ./menu.sh ~/.local/bin/menu.sh
 
 help:
-	@echo "just do 'make install'"
+	@echo "just run 'make menu'"
