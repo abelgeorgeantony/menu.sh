@@ -21,8 +21,11 @@ This example demonstrates a menu containing two sub-menus: apps and system.
 apps:
   start-x-windows:
     run: startx
-  ssh-to-work:
-    run-wait: ssh -t my.host.example.org.co '/bin/sh echo I always forget this hostname'
+  ssh-hosts:
+    home:
+      run: ssh me@home.dialup.example
+    work:
+      run: ssh -t my.host.example.org.co '/bin/sh echo I always forget this hostname'
 system:
   shutdown:
     run: sudo shutdown now
@@ -32,6 +35,8 @@ system:
     run: logout
 ```
 
+Find other examples here: https://github.com/iandennismiller/menu.sh/tree/main/examples
+
 ## Installation
 
 ```bash
@@ -39,13 +44,10 @@ wget https://github.com/iandennismiller/menu.sh/raw/refs/heads/main/menu.sh
 install -C -v ./menu.sh ~/.local/bin/menu.sh
 ```
 
-### yq is required
+### Requirements
 
-https://github.com/mikefarah/yq
-
-### fzf is required
-
-https://github.com/junegunn/fzf
+- yq: https://github.com/mikefarah/yq
+- fzf: https://github.com/junegunn/fzf
 
 ## Why use a console launcher
 
