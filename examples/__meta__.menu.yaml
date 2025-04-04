@@ -15,13 +15,14 @@ requirements:
     install-fzf:
       run: apt install fzf
 examples:
+  __cmd__: ./menu.sh ./examples/$1
   quickstart-demo:
-    run: ./menu.sh ./examples/main.menu.yaml
+    cmd: main.menu.yaml
   using-the-cmd-macro:
-    run: ./menu.sh ./examples/cmd-macro.menu.yaml
+    cmd: cmd-macro.menu.yaml
   include-other-menus:
-    run: ./menu.sh ./examples/include-others.menu.yaml
+    cmd: include-others.menu.yaml
   a-vpn-menu-example:
-    run: ./menu.sh ./examples/vpn.menu.yaml
+    cmd: vpn.menu.yaml
   a-system-menu-example:
-    run: ./menu.sh ./examples/system.menu.yaml
+    cmd: system.menu.yaml
