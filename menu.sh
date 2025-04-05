@@ -4,7 +4,22 @@
 # menu.sh 0.2
 # 2025-04-05
 
-# for the current menu path, set this prefix for fzf's preview
+###
+# path functions
+
+function get_path_parent() {
+    local menu_path
+    menu_path=$1
+
+    menu_path=$(echo "$menu_path" | rev | cut -d. -f2- | rev)
+    if [ -z "$menu_path" ]; then
+        menu_path='.'
+    fi
+
+    echo "$menu_path"
+}
+
+# for the menu path, set this prefix for fzf's preview
 function get_path_fzf_preview() {
     local menu_path
     menu_path=$1
@@ -16,16 +31,7 @@ function get_path_fzf_preview() {
     fi
 }
 
-# if the current menu path has a __cmd__, return it
-function get_path_cmd() {
-    local menu_filename
-    menu_filename=$1
-    local menu_path
-    menu_path=$2
-    get_path_macro "$menu_filename" "$menu_path" "cmd"
-}
-
-# if the current menu path has a __cmd__, return it
+# if the menu path has __${macro_name}__, return it
 function get_path_macro() {
     local menu_filename
     menu_filename=$1
@@ -50,6 +56,9 @@ function get_path_macro() {
         echo "$macro_content"
     fi
 }
+
+###
+# options and selection
 
 function check_if_one_option() {
     local options
@@ -76,7 +85,7 @@ function get_options() {
 }
 
 # append the navigation options to the menu
-function append_navigation() {
+function append_options_navigation() {
     local menu_path
     menu_path=$1
 
@@ -91,6 +100,53 @@ function append_navigation() {
     fi
 
     echo "$options"
+}
+
+# render the current menu path with fzf and return the user's selection
+function get_selection() {
+    local menu_filename
+    menu_filename=$1
+
+    local menu_path
+    menu_path=$2
+
+    local fzf_preview
+    fzf_preview=$(get_path_fzf_preview "$menu_path")
+
+    local options
+    options=$(get_options "$menu_filename" "$menu_path")
+
+    # if there is only one option, then that is automatically our selection
+    if [ "$(check_if_one_option "$options")" ]; then
+        echo "$options"
+    # otherwise, use fzf to show the menu and obtain the user's selection
+    else
+        options=$(append_options_navigation "$menu_path" "$options")
+        fzf \
+            --height=~75 \
+            --margin=4,10,0,10 \
+            --no-color \
+            --reverse \
+            --border=sharp \
+            --border-label="╢${menu_path}╟" \
+            --border-label-pos=3 \
+            --prompt=": " \
+            --preview="yq '$fzf_preview.{}' $menu_filename" \
+            --preview-window=down:3:wrap \
+        <<< "$options"
+    fi
+}
+
+###
+# macro: __cmd__
+
+# if the menu path has a __cmd__, return it
+function get_path_cmd() {
+    local menu_filename
+    menu_filename=$1
+    local menu_path
+    menu_path=$2
+    get_path_macro "$menu_filename" "$menu_path" "cmd"
 }
 
 # evaluate the category command with the arguments
@@ -128,7 +184,7 @@ function apply_cmd() {
     menu_path=$2
 
     local category_cmd
-    category_cmd=$(get_path_cmd "$menu_filename" $(path_parent "$menu_path"))
+    category_cmd=$(get_path_cmd "$menu_filename" $(get_path_parent "$menu_path"))
     if [ ! -z "$category_cmd" ]; then
         local args
         args=$(yq "$menu_path.cmd" "$menu_filename")
@@ -138,52 +194,8 @@ function apply_cmd() {
     fi
 }
 
-# render the current menu path with fzf and return the user's selection
-function get_selection() {
-    local menu_filename
-    menu_filename=$1
-
-    local menu_path
-    menu_path=$2
-
-    local fzf_preview
-    fzf_preview=$(get_path_fzf_preview "$menu_path")
-
-    local options
-    options=$(get_options "$menu_filename" "$menu_path")
-
-    # if there is only one option, then that is automatically our selection
-    if [ "$(check_if_one_option "$options")" ]; then
-        echo "$options"
-    # otherwise, use fzf to show the menu and obtain the user's selection
-    else
-        options=$(append_navigation "$menu_path" "$options")
-        fzf \
-            --height=~75 \
-            --margin=4,10,0,10 \
-            --no-color \
-            --reverse \
-            --border=sharp \
-            --border-label="╢${menu_path}╟" \
-            --border-label-pos=3 \
-            --prompt=": " \
-            --preview="yq '$fzf_preview.{}' $menu_filename" \
-            --preview-window=down:3:wrap \
-        <<< "$options"
-    fi
-}
-
-function path_parent() {
-    local menu_path
-    menu_path=$1
-
-    menu_path=$(echo "$menu_path" | rev | cut -d. -f2- | rev)
-    if [ -z "$menu_path" ]; then
-        menu_path='.'
-    fi
-
-    echo "$menu_path"
-}
+###
+# Main menu rendering
 
 function render_menu() {
     local menu_filename
@@ -221,7 +233,7 @@ function render_menu() {
                 exit 0
                 ;;
             quit-back)
-                menu_path=$(path_parent "$menu_path")
+                menu_path=$(get_path_parent "$menu_path")
                 ;;
             *) 
                 # otherwise, descend into the next level
@@ -232,6 +244,9 @@ function render_menu() {
         esac
     done
 }
+
+###
+# if the script is run with a parameter, assume it is a filename and render the menu with it
 
 if [ -n "$1" ]; then
     clear
