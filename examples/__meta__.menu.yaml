@@ -26,3 +26,10 @@ examples:
     cmd: vpn.menu.yaml
   a-system-menu-example:
     cmd: system.menu.yaml
+about:
+  website:
+    run-wait: clear && echo "https://github.com/iandennismiller/menu.sh"
+  summary:
+    run-wait: clear && echo "menu.sh is a lightweight menu and launcher for text-mode consoles."
+  author:
+    run-wait: clear && echo "menu.sh was written by Ian Dennis Miller."
