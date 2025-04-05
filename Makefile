@@ -9,3 +9,9 @@ test:
 
 help:
 	@echo "just run 'make menu'"
+
+vhs-demo:
+	vhs ./docs/demo.tape
+
+vhs-macro-files:
+	vhs ./docs/macro-files.tape
