@@ -253,8 +253,29 @@ function eval_run() {
     # if the prompt is not empty, run the command with the prompt
     if [ ! -z "$prompt" ]; then
         local REPLY
-        read -p "$prompt"
+        # if whiptail is installed, use it to get the input
+        if command -v whiptail &> /dev/null; then
+            export NEWT_COLORS='
+                root=white,black
+                window=white,black
+                border=gray,black
+                title=white,black
+                actbutton=white,black
+                compactbutton=gray,black
+                entry=white,black
+                '
+            REPLY=$(whiptail --inputbox "" 8 40 --title "$prompt" 3>&1 1>&2 2>&3)
+        # otherwise, use read to get the input
+        else
+            read -p "$prompt"
+        fi
 
+        if [ -z "$REPLY" ]; then
+            echo "ERROR: no input provided"
+            exit 1
+        fi
+
+        # if the prompt is urlencoded, urlencode it
         local urlencode_prompt
         urlencode_prompt=$(get_path_macro "$menu_filename" "$menu_path" "urlencode")
         if [ ! -z "$urlencode_prompt" ]; then
