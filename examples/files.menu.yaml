@@ -9,4 +9,5 @@ examples:
   __files__: ./**/*.yaml
   __cmd__: cat "$1" && read -p 'press enter'
   one:
-    run-wait: echo hi
+    __wait__: true
+    run: echo hi

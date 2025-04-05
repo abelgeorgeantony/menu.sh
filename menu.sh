@@ -92,6 +92,9 @@ function get_options() {
             options=$(echo "$options" | grep -v '__files__')
         fi
 
+        options=$(echo "$options" | grep -v '__prompt__')
+        options=$(echo "$options" | grep -v '__urlencode__')
+        options=$(echo "$options" | grep -v '__wait__')
         echo "$options"
     }
 }
@@ -152,15 +155,6 @@ function get_selection() {
 ###
 # macro: __cmd__
 
-# if the menu path has a __cmd__, return it
-function get_path_cmd() {
-    local menu_filename
-    menu_filename=$1
-    local menu_path
-    menu_path=$2
-    get_path_macro "$menu_filename" "$menu_path" "cmd"
-}
-
 # evaluate the category command with the arguments
 function eval_cmd() {
     local category_cmd
@@ -196,7 +190,7 @@ function apply_cmd() {
     menu_path=$2
 
     local category_cmd
-    category_cmd=$(get_path_cmd "$menu_filename" $(get_path_parent "$menu_path"))
+    category_cmd=$(get_path_macro "$menu_filename" $(get_path_parent "$menu_path") "cmd")
     if [ ! -z "$category_cmd" ]; then
         local args
         args=$(yq "$menu_path.cmd" "$menu_filename")
@@ -209,17 +203,6 @@ function apply_cmd() {
 ###
 # macro: __files__
 
-# if the menu path has a __files__, return it
-function get_path_files() {
-    local menu_filename
-    menu_filename=$1
-
-    local menu_path
-    menu_path=$2
-
-    get_path_macro "$menu_filename" "$menu_path" "files"
-}
-
 # evaluate the __files__ macro as a glob and return the list of files
 function expand_files() {
     local menu_filename
@@ -229,7 +212,7 @@ function expand_files() {
     menu_path=$2
 
     local files
-    files=$(get_path_files "$menu_filename" "$menu_path")
+    files=$(get_path_macro "$menu_filename" "$menu_path" "files")
 
     if [ ! -z "$files" ]; then
         bash -c "ls $files"
@@ -247,7 +230,7 @@ function apply_cmd_to_file() {
     file=$3
     
     local cmd
-    cmd=$(get_path_cmd "$menu_filename" "$menu_path")
+    cmd=$(get_path_macro "$menu_filename" "$menu_path" "cmd")
 
     if [ ! -z "$file" ]; then
         eval_cmd "$cmd" "$file"
@@ -255,21 +238,47 @@ function apply_cmd_to_file() {
 }
 
 ###
-# macro: __prompt__
+# Main menu rendering
 
-# if the menu path has a __cmd__, return it
-function get_path_prompt() {
+function eval_run() {
     local menu_filename
     menu_filename=$1
 
     local menu_path
     menu_path=$2
 
-    get_path_macro "$menu_filename" "$menu_path" "prompt"
-}
+    local prompt
+    prompt=$(get_path_macro "$menu_filename" "$menu_path" "prompt")
 
-###
-# Main menu rendering
+    # if the prompt is not empty, run the command with the prompt
+    if [ ! -z "$prompt" ]; then
+        local REPLY
+        read -p "$prompt"
+
+        local urlencode_prompt
+        urlencode_prompt=$(get_path_macro "$menu_filename" "$menu_path" "urlencode")
+        if [ ! -z "$urlencode_prompt" ]; then
+            # if the prompt is a URL, urlencode it
+            REPLY=$(urlencode "$REPLY")
+        fi
+
+        local cmd_fmt
+        cmd_fmt=$(yq "$menu_path".run "$menu_filename")
+
+        local cmd
+        # even if REPLY has multiple items, return them all
+        printf -v cmd "$cmd_fmt" "${REPLY[@]}"
+        /bin/bash -c "$cmd"
+    else
+        /bin/bash -c "$(yq "$menu_path".run "$menu_filename")"
+    fi
+
+    local wait
+    wait=$(get_path_macro "$menu_filename" "$menu_path" "wait")
+    if [ ! -z "$wait" ]; then
+        read -p "Press enter to continue"
+    fi
+}
 
 function render_menu() {
     local menu_filename
@@ -288,20 +297,14 @@ function render_menu() {
 
         case $choice in
             run)
-                /bin/bash -c "$(yq "$menu_path".run "$menu_filename")"
-                menu_path='.'
+                eval_run "$menu_filename" "$menu_path"
                 clear
-                ;;
-            run-wait)
-                /bin/bash -c "$(yq $menu_path.run-wait $menu_filename)"
-                read -p "Press enter to continue"
                 menu_path='.'
-                clear
                 ;;
             cmd)
                 apply_cmd "$menu_filename" "$menu_path"
-                menu_path='.'
                 clear
+                menu_path='.'
                 ;;
             quit)
                 exit 0
@@ -313,8 +316,8 @@ function render_menu() {
                 # if the choice is a file, run the command on it
                 if [ -f "$choice" ]; then
                     apply_cmd_to_file "$menu_filename" "$menu_path" "$choice"
-                    menu_path='.'
                     clear
+                    menu_path='.'
                     continue
                 fi
 
@@ -325,6 +328,26 @@ function render_menu() {
                 ;;
         esac
     done
+}
+
+function urlencode() {
+    s="${1//'%'/%25}"
+    s="${s//' '/%20}"
+    s="${s//'"'/%22}"
+    s="${s//'#'/%23}"
+    s="${s//'$'/%24}"
+    s="${s//'&'/%26}"
+    s="${s//'+'/%2B}"
+    s="${s//','/%2C}"
+    s="${s//'/'/%2F}"
+    s="${s//':'/%3A}"
+    s="${s//';'/%3B}"
+    s="${s//'='/%3D}"
+    s="${s//'?'/%3F}"
+    s="${s//'@'/%40}"
+    s="${s//'['/%5B}"
+    s="${s//']'/%5D}"
+    printf %s "$s"
 }
 
 ###

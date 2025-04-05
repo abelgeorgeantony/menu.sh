@@ -11,16 +11,21 @@ requirements:
       cmd: fzf
   install-requirement:
     install-yq:
-      run-wait: YQ_VERSION=v4.45.1 YQ_ARCH=linux_amd64 wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_${YQ_ARCH} -O /usr/local/bin/yq && chmod +x /usr/local/bin/yq
+      __wait__: true
+      run: YQ_VERSION=v4.45.1 YQ_ARCH=linux_amd64 wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_${YQ_ARCH} -O /usr/local/bin/yq && chmod +x /usr/local/bin/yq
     install-fzf:
-      run-wait: apt install fzf
+      __wait__: true
+      run: apt install fzf
 examples:
   __cmd__: ./menu.sh $1
   __files__: ./examples/*.yaml
 about:
   website:
-    run-wait: clear && echo "https://github.com/iandennismiller/menu.sh"
+    __wait__: true
+    run: clear && echo "https://github.com/iandennismiller/menu.sh"
   summary:
-    run-wait: clear && echo "menu.sh is a lightweight menu and launcher for text-mode consoles."
+    __wait__: true
+    run: clear && echo "menu.sh is a lightweight menu and launcher for text-mode consoles."
   author:
-    run-wait: clear && echo "menu.sh was written by Ian Dennis Miller."
+    __wait__: true
+    run: clear && echo "menu.sh was written by Ian Dennis Miller."

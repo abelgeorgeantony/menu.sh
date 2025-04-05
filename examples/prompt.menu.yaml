@@ -1,0 +1,15 @@
+#!/usr/bin/env menu.sh
+---
+search:
+  __prompt__: "Search: "
+  __urlencode__: true
+  run: "open https://duckduckgo.com/?q=%s"
+website:
+  __prompt__: "https://"
+  run: "open https://%s"
+hello-world:
+  __wait__: true
+  run: echo hello world
+view-examples:
+  __files__: ./**/*.yaml
+  __cmd__: cat "$1" && read -p 'press enter'
