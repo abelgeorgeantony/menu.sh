@@ -20,19 +20,34 @@ function get_path_fzf_preview() {
 function get_path_cmd() {
     local menu_filename
     menu_filename=$1
+    local menu_path
+    menu_path=$2
+    get_path_macro "$menu_filename" "$menu_path" "cmd"
+}
+
+# if the current menu path has a __cmd__, return it
+function get_path_macro() {
+    local menu_filename
+    menu_filename=$1
 
     local menu_path
     menu_path=$2
 
-    local cmd
+    local macro_name
+    macro_name=$3
+
+    local macro_yq
     if [ "$menu_path" == '.' ]; then
-        cmd=$(yq ".__cmd__" "$menu_filename")
+        macro_yq=".__${macro_name}__"
     else
-        cmd=$(yq "${menu_path}.__cmd__" "$menu_filename")
+        macro_yq="${menu_path}.__${macro_name}__"
     fi
 
-    if [ ! -z "$cmd" ] && [ "$cmd" != "null" ]; then
-        echo "$cmd"
+    local macro_content
+    macro_content=$(yq "$macro_yq" "$menu_filename")
+    
+    if [ ! -z "$macro_content" ] && [ "$macro_content" != "null" ]; then
+        echo "$macro_content"
     fi
 }
 
@@ -113,7 +128,7 @@ function apply_cmd() {
     menu_path=$2
 
     local category_cmd
-    category_cmd=$(get_path_cmd "$menu_filename" "$menu_path")
+    category_cmd=$(get_path_cmd "$menu_filename" $(path_parent "$menu_path"))
     if [ ! -z "$category_cmd" ]; then
         local args
         args=$(yq "$menu_path.cmd" "$menu_filename")
@@ -158,6 +173,18 @@ function get_selection() {
     fi
 }
 
+function path_parent() {
+    local menu_path
+    menu_path=$1
+
+    menu_path=$(echo "$menu_path" | rev | cut -d. -f2- | rev)
+    if [ -z "$menu_path" ]; then
+        menu_path='.'
+    fi
+
+    echo "$menu_path"
+}
+
 function render_menu() {
     local menu_filename
     menu_filename=$1
@@ -194,10 +221,7 @@ function render_menu() {
                 exit 0
                 ;;
             quit-back)
-                menu_path=$(echo "$menu_path" | rev | cut -d. -f2- | rev)
-                if [ -z "$MENU_PATH" ]; then
-                    menu_path='.'
-                fi
+                menu_path=$(path_parent "$menu_path")
                 ;;
             *) 
                 # otherwise, descend into the next level

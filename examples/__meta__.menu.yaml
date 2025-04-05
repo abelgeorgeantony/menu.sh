@@ -4,16 +4,16 @@ install:
   run: install -C -v ./menu.sh ~/.local/bin/menu.sh
 requirements:
   check-if-installed:
-    __cmd__: "[ -z $(which $1) ] && echo $1 is NOT installed || echo $1 is installed"
+    __cmd__: "[ -z $(which $1) ] && read -p \"$1 is NOT installed\" || read -p \"$1 is installed\""
     is-yq-installed:
       cmd: yq
     is-fzf-installed:
       cmd: fzf
   install-requirement:
     install-yq:
-      run: YQ_VERSION=v4.45.1 YQ_ARCH=linux_amd64 wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_${YQ_ARCH} -O /usr/local/bin/yq && chmod +x /usr/local/bin/yq
+      run-wait: YQ_VERSION=v4.45.1 YQ_ARCH=linux_amd64 wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_${YQ_ARCH} -O /usr/local/bin/yq && chmod +x /usr/local/bin/yq
     install-fzf:
-      run: apt install fzf
+      run-wait: apt install fzf
 examples:
   __cmd__: ./menu.sh ./examples/$1
   quickstart-demo:
