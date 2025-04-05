@@ -15,17 +15,8 @@ requirements:
     install-fzf:
       run-wait: apt install fzf
 examples:
-  __cmd__: ./menu.sh ./examples/$1
-  quickstart-demo:
-    cmd: main.menu.yaml
-  using-the-cmd-macro:
-    cmd: cmd-macro.menu.yaml
-  include-other-menus:
-    cmd: include-others.menu.yaml
-  a-vpn-menu-example:
-    cmd: vpn.menu.yaml
-  a-system-menu-example:
-    cmd: system.menu.yaml
+  __cmd__: ./menu.sh $1
+  __files__: ./examples/*.yaml
 about:
   website:
     run-wait: clear && echo "https://github.com/iandennismiller/menu.sh"

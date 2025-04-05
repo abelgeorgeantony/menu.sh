@@ -84,8 +84,12 @@ function get_options() {
         local files
         files=$(expand_files "$menu_filename" "$menu_path")
         if [ ! -z "$files" ]; then
+            if [ ! -z "$options" ]; then
+                options=$(printf "%s\n%s" "$options" "$files")
+            else
+                options="$files"
+            fi
             options=$(echo "$options" | grep -v '__files__')
-            options=$(printf "%s\n%s" "$options" "$files")
         fi
 
         echo "$options"
