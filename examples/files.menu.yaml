@@ -1,0 +1,12 @@
+#!/usr/bin/env menu.sh
+---
+local-bin:
+  __files__: ~/.local/bin/*.sh
+  __cmd__: $1
+  one:
+    run: echo hi
+examples:
+  __files__: ./**/*.yaml
+  __cmd__: cat "$1" && read -p 'press enter'
+  one:
+    run-wait: echo hi

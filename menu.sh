@@ -80,6 +80,14 @@ function get_options() {
         # remove __cmd__ from options if it is there
         options=$(echo "$options" | grep -v '__cmd__')
 
+        # if there is a files macro, expand it
+        local files
+        files=$(expand_files "$menu_filename" "$menu_path")
+        if [ ! -z "$files" ]; then
+            options=$(echo "$options" | grep -v '__files__')
+            options=$(printf "%s\n%s" "$options" "$files")
+        fi
+
         echo "$options"
     }
 }
@@ -195,6 +203,68 @@ function apply_cmd() {
 }
 
 ###
+# macro: __files__
+
+# if the menu path has a __files__, return it
+function get_path_files() {
+    local menu_filename
+    menu_filename=$1
+
+    local menu_path
+    menu_path=$2
+
+    get_path_macro "$menu_filename" "$menu_path" "files"
+}
+
+# evaluate the __files__ macro as a glob and return the list of files
+function expand_files() {
+    local menu_filename
+    menu_filename=$1
+
+    local menu_path
+    menu_path=$2
+
+    local files
+    files=$(get_path_files "$menu_filename" "$menu_path")
+
+    if [ ! -z "$files" ]; then
+        bash -c "ls $files"
+    fi
+}
+
+function apply_cmd_to_file() {
+    local menu_filename
+    menu_filename=$1
+
+    local menu_path
+    menu_path=$2
+
+    local file
+    file=$3
+    
+    local cmd
+    cmd=$(get_path_cmd "$menu_filename" "$menu_path")
+
+    if [ ! -z "$file" ]; then
+        eval_cmd "$cmd" "$file"
+    fi
+}
+
+###
+# macro: __prompt__
+
+# if the menu path has a __cmd__, return it
+function get_path_prompt() {
+    local menu_filename
+    menu_filename=$1
+
+    local menu_path
+    menu_path=$2
+
+    get_path_macro "$menu_filename" "$menu_path" "prompt"
+}
+
+###
 # Main menu rendering
 
 function render_menu() {
@@ -235,7 +305,15 @@ function render_menu() {
             quit-back)
                 menu_path=$(get_path_parent "$menu_path")
                 ;;
-            *) 
+            *)
+                # if the choice is a file, run the command on it
+                if [ -f "$choice" ]; then
+                    apply_cmd_to_file "$menu_filename" "$menu_path" "$choice"
+                    menu_path='.'
+                    clear
+                    continue
+                fi
+
                 # otherwise, descend into the next level
                 local fzf_preview
                 fzf_preview=$(get_path_fzf_preview "$menu_path")
