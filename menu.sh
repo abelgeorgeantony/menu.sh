@@ -140,12 +140,12 @@ function get_selection() {
         fzf \
             --height=~75 \
             --margin=4,10,0,10 \
-            --no-color \
+            --color='fg:#FFFFFF,border:#FFFFFF,bg+:black,gutter:gray,pointer:#FFFFFF' \
             --reverse \
             --border=sharp \
             --border-label="╢${menu_path}╟" \
             --border-label-pos=3 \
-            --prompt=": " \
+            --prompt="# " \
             --preview="yq '$fzf_preview.{}' $menu_filename" \
             --preview-window=down:3:wrap \
         <<< "$options"
@@ -258,10 +258,10 @@ function eval_run() {
             export NEWT_COLORS='
                 root=white,black
                 window=white,black
-                border=gray,black
+                border=white,black
                 title=white,black
-                actbutton=white,black
-                compactbutton=gray,black
+                button=white,black
+                compactbutton=lightgray,black
                 entry=white,black
                 '
             REPLY=$(whiptail --inputbox "" 8 40 --title "$prompt" 3>&1 1>&2 2>&3)
@@ -270,26 +270,23 @@ function eval_run() {
             read -p "$prompt"
         fi
 
-        if [ -z "$REPLY" ]; then
-            echo "ERROR: no input provided"
-            exit 1
+        if [ ! -z "$REPLY" ]; then
+            # if the prompt is urlencoded, urlencode it
+            local urlencode_prompt
+            urlencode_prompt=$(get_path_macro "$menu_filename" "$menu_path" "urlencode")
+            if [ ! -z "$urlencode_prompt" ]; then
+                # if the prompt is a URL, urlencode it
+                REPLY=$(urlencode "$REPLY")
+            fi
+
+            local cmd_fmt
+            cmd_fmt=$(yq "$menu_path".run "$menu_filename")
+
+            # even if REPLY has multiple items, return them all
+            local cmd
+            printf -v cmd "$cmd_fmt" "${REPLY[@]}"
+            /bin/bash -c "$cmd"
         fi
-
-        # if the prompt is urlencoded, urlencode it
-        local urlencode_prompt
-        urlencode_prompt=$(get_path_macro "$menu_filename" "$menu_path" "urlencode")
-        if [ ! -z "$urlencode_prompt" ]; then
-            # if the prompt is a URL, urlencode it
-            REPLY=$(urlencode "$REPLY")
-        fi
-
-        local cmd_fmt
-        cmd_fmt=$(yq "$menu_path".run "$menu_filename")
-
-        local cmd
-        # even if REPLY has multiple items, return them all
-        printf -v cmd "$cmd_fmt" "${REPLY[@]}"
-        /bin/bash -c "$cmd"
     else
         /bin/bash -c "$(yq "$menu_path".run "$menu_filename")"
     fi
