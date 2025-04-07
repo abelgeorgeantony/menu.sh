@@ -1,4 +1,4 @@
-Output tutorials/macro-files.gif
+Output tutorials/macro-prompt.gif
 
 Require echo
 
@@ -28,14 +28,14 @@ Sleep 1s
 
 Enter
 Sleep 500ms
-Type "# Learn how to use the menu.sh __files__ macro."
+Type "# Learn how to use the menu.sh __prompt__ macro."
 Sleep 500ms
 Enter
 Sleep 2s
 
 Enter
 Sleep 500ms
-Type "# Dynamically add files from any path to your menu with __files__."
+Type "# Dynamically add prompt from any path to your menu with __prompt__."
 Sleep 500ms
 Enter
 Sleep 2s
@@ -66,14 +66,14 @@ Sleep 500ms
 Enter
 Sleep 500ms
 
-Type "cat ./examples/files.menu.yaml"
+Type "cat ./examples/prompt.menu.yaml"
 Sleep 1s
 Enter
 Sleep 4s
 
 Enter
 Sleep 500ms
-Type "# The __files__ macro './**/*.yaml' adds YAML files to the menu."
+Type "# The __prompt__ macro './**/*.yaml' adds YAML prompt to the menu."
 Sleep 500ms
 Enter
 Sleep 2s
@@ -94,7 +94,7 @@ Sleep 2s
 
 Enter
 Sleep 500ms
-Type "./examples/files.menu.yaml"
+Type "./examples/prompt.menu.yaml"
 Sleep 1s
 Enter
 Sleep 4s
@@ -103,7 +103,7 @@ Sleep 4s
 Enter
 Sleep 4s
 
-# go down to files.menu.yaml
+# go down to prompt.menu.yaml
 Down
 Sleep 1s
 Down
@@ -127,7 +127,7 @@ Sleep 1s
 Enter
 Sleep 2s
 
-Type "# We effectively ran 'cat ./examples/files.menu.yaml'"
+Type "# We effectively ran 'cat ./examples/prompt.menu.yaml'"
 Sleep 500ms
 Enter
 Sleep 2s
@@ -144,7 +144,7 @@ Sleep 500ms
 Enter
 Sleep 500ms
 
-Type "cat ./examples/files.menu.yaml"
+Type "cat ./examples/prompt.menu.yaml"
 Sleep 500ms 
 Enter
 Sleep 10s

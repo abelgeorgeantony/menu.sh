@@ -64,31 +64,58 @@ Set FontSize 20
 Set Width 1200
 Set Height 600
 
-Type "cd examples" Sleep 500ms  Enter
-Type "cat main.menu.yaml" Sleep 500ms  Enter
+Type "cd examples"
+Sleep 500ms
+Enter
 
+Type "cat main.menu.yaml"
+Sleep 500ms
+Enter
 Sleep 3s
 
-Type "./main.menu.yaml" Sleep 500ms  Enter
-
+Type "./main.menu.yaml"
+Sleep 500ms
+Enter
 Sleep 3s
 
-Down Sleep 500ms Enter
-
+Down
+Sleep 500ms
+Enter
 Sleep 3s
 
-Down Sleep 500ms Down Sleep 500ms Down Sleep 500ms Enter
-
+Down
+Sleep 500ms
+Down
+Sleep 500ms
+Down
+Sleep 500ms
+Enter
 Sleep 1s
 
 Enter
-
-Down Sleep 500ms Enter
-
-Down Sleep 1s Down Sleep 1s Down Sleep 500ms Enter
-
+Sleep 500ms
+Down
+Sleep 500ms
+Enter
 Sleep 500ms
 
-Down Sleep 250ms Down Sleep 250ms Enter
+Down
+Sleep 1s
+Down
+Sleep 1s
+Down
+Sleep 500ms
+Enter
+Sleep 500ms
 
-Down Sleep 250ms Down Sleep 500ms Enter
+Down
+Sleep 250ms
+Down
+Sleep 250ms
+Enter
+
+Down
+Sleep 250ms
+Down
+Sleep 500ms
+Enter

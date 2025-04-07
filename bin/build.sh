@@ -17,8 +17,11 @@ cat \
     > var/cat-menu.sh
 
 # remove comments
-# sed 's:^\s*#.*$::g' var/cat-menu.sh \
-sed -e 's:^\s*#.*$::g' -e 's/^[ \t]*#[^!].*$//g' -e 's/[ \t]#.*$//g' var/cat-menu.sh \
+sed \
+    -e 's:^\s*#.*$::g' \
+    -e 's/^[ \t]*#[^!].*$//g' \
+    -e 's/[ \t]#.*$//g' \
+    var/cat-menu.sh \
     > var/no-comments-menu.sh
 
 # remove duplicated empty lines
