@@ -17,16 +17,16 @@ cat \
     > var/cat-menu.sh
 
 # remove comments
-sed 's:^\s*#.*$::g' var/cat-menu.sh \
+# sed 's:^\s*#.*$::g' var/cat-menu.sh \
+sed -e 's:^\s*#.*$::g' -e 's/^[ \t]*#[^!].*$//g' -e 's/[ \t]#.*$//g' var/cat-menu.sh \
     > var/no-comments-menu.sh
 
 # remove duplicated empty lines
 cat var/no-comments-menu.sh \
-    | awk 'BEGIN{RS="\n\n\n" ; ORS="\n\n";}{ print }' \
-    | awk 'BEGIN{RS="\n\n\n" ; ORS="\n\n";}{ print }' \
-    | awk 'BEGIN{RS="\n\n\n" ; ORS="\n\n";}{ print }' \
-    | awk 'BEGIN{RS="\n\n\n" ; ORS="\n\n";}{ print }' \
-    | awk 'BEGIN{RS="\n\n\n" ; ORS="\n\n";}{ print }' \
+    | awk 'BEGIN{RS="\n\n" ; ORS="\n";}{ print }' \
+    | awk 'BEGIN{RS="\n\n" ; ORS="\n";}{ print }' \
+    | awk 'BEGIN{RS="\n\n" ; ORS="\n";}{ print }' \
+    | awk 'BEGIN{RS="\n\n" ; ORS="\n";}{ print }' \
     > var/newlines-menu.sh
 
 # prepend the header to the file

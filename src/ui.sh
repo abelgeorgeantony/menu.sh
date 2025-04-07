@@ -3,7 +3,7 @@
 # https://github.com/iandennismiller/menu.sh
 
 # render the current menu path with fzf and return the user's selection
-function get_selection() {
+function render_fzf_menu() {
     local menu_filename
     menu_filename=$1
 
@@ -37,7 +37,7 @@ function get_selection() {
     fi
 }
 
-function render_menu() {
+function menu_loop() {
     local menu_filename
     menu_filename=$1
 
@@ -45,14 +45,14 @@ function render_menu() {
     menu_path='.'
 
     while true; do
-        local choice
-        choice=$(get_selection "$menu_filename" "$menu_path")
+        local selection
+        selection=$(render_fzf_menu "$menu_filename" "$menu_path")
 
-        if [ "$choice" == "" ]; then
+        if [ "$selection" == "" ]; then
             exit 0
         fi
 
-        case $choice in
+        case $selection in
             run)
                 eval_run "$menu_filename" "$menu_path"
                 clear
@@ -70,9 +70,9 @@ function render_menu() {
                 menu_path=$(get_path_parent "$menu_path")
                 ;;
             *)
-                # if the choice is a file, run the command on it
-                if [ -f "$choice" ]; then
-                    apply_cmd_to_file "$menu_filename" "$menu_path" "$choice"
+                # if the selection is a file, run the command on it
+                if [ -f "$selection" ]; then
+                    apply_cmd_to_file "$menu_filename" "$menu_path" "$selection"
                     clear
                     menu_path='.'
                     continue
@@ -81,7 +81,7 @@ function render_menu() {
                 # otherwise, descend into the next level
                 local fzf_preview
                 fzf_preview=$(get_path_fzf_preview "$menu_path")
-                menu_path="$fzf_preview.$choice"
+                menu_path="$fzf_preview.$selection"
                 ;;
         esac
     done

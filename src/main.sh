@@ -7,5 +7,5 @@
 
 if [ -n "$1" ]; then
     clear
-    render_menu "$1"
+    menu_loop "$1"
 fi
