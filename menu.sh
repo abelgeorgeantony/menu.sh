@@ -1,11 +1,7 @@
 #!/bin/bash
+# menu.sh 0.2
 # Ian Dennis Miller
 # https://github.com/iandennismiller/menu.sh
-# menu.sh 0.2
-# 2025-04-05
-
-###
-# path functions
 
 function get_path_parent() {
     local menu_path
@@ -19,7 +15,6 @@ function get_path_parent() {
     echo "$menu_path"
 }
 
-# for the menu path, set this prefix for fzf's preview
 function get_path_fzf_preview() {
     local menu_path
     menu_path=$1
@@ -31,7 +26,6 @@ function get_path_fzf_preview() {
     fi
 }
 
-# if the menu path has __${macro_name}__, return it
 function get_path_macro() {
     local menu_filename
     menu_filename=$1
@@ -56,9 +50,6 @@ function get_path_macro() {
         echo "$macro_content"
     fi
 }
-
-###
-# options and selection
 
 function check_if_one_option() {
     local options
@@ -99,7 +90,6 @@ function get_options() {
     }
 }
 
-# append the navigation options to the menu
 function append_options_navigation() {
     local menu_path
     menu_path=$1
@@ -117,7 +107,6 @@ function append_options_navigation() {
     echo "$options"
 }
 
-# render the current menu path with fzf and return the user's selection
 function get_selection() {
     local menu_filename
     menu_filename=$1
@@ -152,10 +141,56 @@ function get_selection() {
     fi
 }
 
-###
-# macro: __cmd__
+function render_menu() {
+    local menu_filename
+    menu_filename=$1
 
-# evaluate the category command with the arguments
+    local menu_path
+    menu_path='.'
+
+    while true; do
+        local choice
+        choice=$(get_selection "$menu_filename" "$menu_path")
+
+        if [ "$choice" == "" ]; then
+            exit 0
+        fi
+
+        case $choice in
+            run)
+                eval_run "$menu_filename" "$menu_path"
+                clear
+                menu_path='.'
+                ;;
+            cmd)
+                apply_cmd "$menu_filename" "$menu_path"
+                clear
+                menu_path='.'
+                ;;
+            quit)
+                exit 0
+                ;;
+            quit-back)
+                menu_path=$(get_path_parent "$menu_path")
+                ;;
+            *)
+                # if the choice is a file, run the command on it
+                if [ -f "$choice" ]; then
+                    apply_cmd_to_file "$menu_filename" "$menu_path" "$choice"
+                    clear
+                    menu_path='.'
+                    continue
+                fi
+
+                # otherwise, descend into the next level
+                local fzf_preview
+                fzf_preview=$(get_path_fzf_preview "$menu_path")
+                menu_path="$fzf_preview.$choice"
+                ;;
+        esac
+    done
+}
+
 function eval_cmd() {
     local category_cmd
     category_cmd=$1
@@ -181,7 +216,6 @@ function eval_cmd() {
     rm /tmp/cmd.sh
 }
 
-# identify the category command and its arguments, then run it if possible
 function apply_cmd() {
     local menu_filename
     menu_filename=$1
@@ -200,10 +234,6 @@ function apply_cmd() {
     fi
 }
 
-###
-# macro: __files__
-
-# evaluate the __files__ macro as a glob and return the list of files
 function expand_files() {
     local menu_filename
     menu_filename=$1
@@ -215,7 +245,7 @@ function expand_files() {
     files=$(get_path_macro "$menu_filename" "$menu_path" "files")
 
     if [ ! -z "$files" ]; then
-        bash -c "ls $files"
+        bash -c "ls -1 $files"
     fi
 }
 
@@ -236,9 +266,6 @@ function apply_cmd_to_file() {
         eval_cmd "$cmd" "$file"
     fi
 }
-
-###
-# Main menu rendering
 
 function eval_run() {
     local menu_filename
@@ -298,56 +325,6 @@ function eval_run() {
     fi
 }
 
-function render_menu() {
-    local menu_filename
-    menu_filename=$1
-
-    local menu_path
-    menu_path='.'
-
-    while true; do
-        local choice
-        choice=$(get_selection "$menu_filename" "$menu_path")
-
-        if [ "$choice" == "" ]; then
-            exit 0
-        fi
-
-        case $choice in
-            run)
-                eval_run "$menu_filename" "$menu_path"
-                clear
-                menu_path='.'
-                ;;
-            cmd)
-                apply_cmd "$menu_filename" "$menu_path"
-                clear
-                menu_path='.'
-                ;;
-            quit)
-                exit 0
-                ;;
-            quit-back)
-                menu_path=$(get_path_parent "$menu_path")
-                ;;
-            *)
-                # if the choice is a file, run the command on it
-                if [ -f "$choice" ]; then
-                    apply_cmd_to_file "$menu_filename" "$menu_path" "$choice"
-                    clear
-                    menu_path='.'
-                    continue
-                fi
-
-                # otherwise, descend into the next level
-                local fzf_preview
-                fzf_preview=$(get_path_fzf_preview "$menu_path")
-                menu_path="$fzf_preview.$choice"
-                ;;
-        esac
-    done
-}
-
 function urlencode() {
     s="${1//'%'/%25}"
     s="${s//' '/%20}"
@@ -368,10 +345,12 @@ function urlencode() {
     printf %s "$s"
 }
 
-###
-# if the script is run with a parameter, assume it is a filename and render the menu with it
-
 if [ -n "$1" ]; then
     clear
     render_menu "$1"
 fi
+
+
+
+
+

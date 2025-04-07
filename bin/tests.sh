@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./menu.sh
+source ./var/menu.sh
 
 menu_filename="./examples/__meta__.menu.yaml"
 
@@ -52,11 +52,11 @@ result=$(append_options_navigation "$menu_filename" ".examples")
 # get_path_cmd
 
 echo -n "get_path_cmd has none "
-result=$(get_path_cmd "$menu_filename" ".")
+result=$(get_path_macro "$menu_filename" "." "cmd")
 [ "$result" == "" ] && echo "OK" || echo "FAIL: $result"
 
 echo -n "get_path_cmd has one "
-result=$(get_path_cmd "$menu_filename" ".examples")
+result=$(get_path_macro "$menu_filename" ".examples" "cmd")
 [ "$result" != "" ] && echo "OK" || echo "FAIL: $result"
 
 # eval_cmd
@@ -72,11 +72,11 @@ result=$(get_path_cmd "$menu_filename" ".examples")
 menu_filename="./examples/files.menu.yaml"
 
 echo -n "get_path_files root "
-result=$(get_path_files "$menu_filename" ".")
+result=$(get_path_macro "$menu_filename" "." "files")
 [ "$result" == "" ] && echo "OK" || echo "FAIL: $result"
 
 echo -n "get_path_files subdir "
-result=$(get_path_files "$menu_filename" ".examples")
+result=$(get_path_macro "$menu_filename" ".examples" "files")
 [ "$result" != "" ] && echo "OK" || echo "FAIL: $result"
 
 echo -n "expand_files "
