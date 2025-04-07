@@ -55,7 +55,7 @@
 #   Hide                            Hide the subsequent commands from the output
 #   Show                            Show the subsequent commands in the output
 
-Output menu-demo.gif
+Output tutorials/30s-demo.gif
 
 Require echo
 

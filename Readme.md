@@ -15,7 +15,7 @@ https://github.com/iandennismiller/menu.sh
 
 This example demonstrates a menu containing two sub-menus: apps and system.
 
-![menu.sh demonstration](docs/menu-demo.gif)
+![menu.sh 30-second demonstration](tutorials/30s-demo.gif)
 
 ```yaml
 #!/usr/bin/env menu.sh
@@ -134,4 +134,16 @@ host2:
   cmd: host2.full.hostname
 host3-is-different:
   run: autossh -M 0 -J proxy-host -t host3.full.hostname "/bin/bash -c 'tmux new-session -A -s main'"
+```
+
+### The `__files__` macro
+
+![menu.sh __files__ tutorial](tutorials/macro-files.gif)
+
+```yaml
+#!/usr/bin/env menu.sh
+---
+examples:
+  __files__: ./**/*.yaml
+  __cmd__: cat "$1" && read -p "press enter"
 ```

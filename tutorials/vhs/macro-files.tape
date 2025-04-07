@@ -1,4 +1,4 @@
-Output docs/macro-files.gif
+Output tutorials/macro-files.gif
 
 Require echo
 
