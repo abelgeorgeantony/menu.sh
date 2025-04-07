@@ -27,7 +27,7 @@ function apply_cmd_to_file() {
 
     local file
     file=$3
-    
+
     local cmd
     cmd=$(get_path_macro "$menu_filename" "$menu_path" "cmd")
 

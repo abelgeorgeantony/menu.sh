@@ -204,7 +204,6 @@ function apply_cmd_to_file() {
     menu_path=$2
     local file
     file=$3
-    
     local cmd
     cmd=$(get_path_macro "$menu_filename" "$menu_path" "cmd")
     if [ ! -z "$file" ]; then
