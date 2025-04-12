@@ -8,4 +8,5 @@
 if [ -n "$1" ]; then
     clear
     menu_loop "$1"
+    exit 0
 fi

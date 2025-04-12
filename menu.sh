@@ -52,7 +52,7 @@ function get_options() {
     local menu_path
     menu_path=$2
     local options
-    options=$(yq "$menu_path | keys | .[]" "$menu_filename" 2> /dev/null) && {
+    options=$(yq "$menu_path | keys | .[]" "$menu_filename" 2>/dev/null) && {
         options=$(echo "$options" | grep -v '__cmd__')
         local files
         files=$(expand_files "$menu_filename" "$menu_path")
@@ -82,11 +82,34 @@ function append_options_navigation() {
     fi
     echo "$options"
 }
+function get_option_position() {
+    local menu_filename
+    menu_filename=$1
+    local menu_path
+    menu_path=$2
+    local option
+    option=$3
+    local options
+    options=$(get_options "$menu_filename" "$menu_path")
+    options=$(echo $options | tr -d '[:cntrl:]')
+    read -a options <<<"$options"
+    local position
+    position=1
+    for opt in "${options[@]}"; do
+        if [[ "$opt" = "$option" ]]; then
+            echo "$position"
+        fi
+        position=$((position + 1))
+    done
+    echo 1
+}
 function render_fzf_menu() {
     local menu_filename
     menu_filename=$1
     local menu_path
     menu_path=$2
+    local cursor_position
+    cursor_position=$3
     local fzf_preview
     fzf_preview=$(get_path_fzf_preview "$menu_path")
     local options
@@ -96,6 +119,7 @@ function render_fzf_menu() {
     else
         options=$(append_options_navigation "$menu_path" "$options")
         fzf \
+            --sync --bind 'result:transform:[[ -z {q} ]] && echo "pos('${cursor_position}')"' \
             --height=~75 \
             --margin=4,10,0,10 \
             --color='fg:#FFFFFF,border:#FFFFFF,bg+:black,gutter:gray,pointer:#FFFFFF' \
@@ -106,7 +130,7 @@ function render_fzf_menu() {
             --prompt="# " \
             --preview="yq '$fzf_preview.{}' $menu_filename" \
             --preview-window=down:3:wrap \
-        <<< "$options"
+            <<<"$options"
     fi
 }
 function menu_loop() {
@@ -114,40 +138,56 @@ function menu_loop() {
     menu_filename=$1
     local menu_path
     menu_path='.'
+    local cursor_position
+    cursor_position=1
+    declare -a selection_stack
     while true; do
         local selection
-        selection=$(render_fzf_menu "$menu_filename" "$menu_path")
+        selection=$(render_fzf_menu "$menu_filename" "$menu_path" $cursor_position)
+        selection_stack+=("$selection")
         if [ "$selection" == "" ]; then
             exit 0
         fi
         case $selection in
-            run)
-                eval_run "$menu_filename" "$menu_path"
+        run)
+            eval_run "$menu_filename" "$menu_path"
+            clear
+            menu_path='.'
+            ;;
+        cmd)
+            apply_cmd "$menu_filename" "$menu_path"
+            clear
+            menu_path='.'
+            ;;
+        button)
+            click_button "$menu_filename" "$menu_path"
+            clear
+            menu_path=$(get_path_parent "$menu_path")
+            unset selection_stack[-1]
+            cursor_position=$(get_option_position "$menu_filename" "$menu_path" "${selection_stack[-1]}")
+            unset selection_stack[-1]
+            ;;
+        quit)
+            exit 0
+            ;;
+        quit-back)
+            menu_path=$(get_path_parent "$menu_path")
+            unset selection_stack[-1]
+            cursor_position=$(get_option_position "$menu_filename" "$menu_path" "${selection_stack[-1]}")
+            unset selection_stack[-1]
+            ;;
+        *)
+            if [ -f "$selection" ]; then
+                apply_cmd_to_file "$menu_filename" "$menu_path" "$selection"
                 clear
                 menu_path='.'
-                ;;
-            cmd)
-                apply_cmd "$menu_filename" "$menu_path"
-                clear
-                menu_path='.'
-                ;;
-            quit)
-                exit 0
-                ;;
-            quit-back)
-                menu_path=$(get_path_parent "$menu_path")
-                ;;
-            *)
-                if [ -f "$selection" ]; then
-                    apply_cmd_to_file "$menu_filename" "$menu_path" "$selection"
-                    clear
-                    menu_path='.'
-                    continue
-                fi
-                local fzf_preview
-                fzf_preview=$(get_path_fzf_preview "$menu_path")
-                menu_path="$fzf_preview.$selection"
-                ;;
+                continue
+            fi
+            local fzf_preview
+            fzf_preview=$(get_path_fzf_preview "$menu_path")
+            menu_path="$fzf_preview.$selection"
+            cursor_position=1
+            ;;
         esac
     done
 }
@@ -254,6 +294,13 @@ function eval_run() {
         read -p "Press enter to continue"
     fi
 }
+function click_button() {
+    local menu_filename
+    menu_filename=$1
+    local menu_path
+    menu_path=$2
+    /bin/bash -c "$(yq "$menu_path".button "$menu_filename")" &>/dev/null & disown;
+}
 function urlencode() {
     s="${1//'%'/%25}"
     s="${s//' '/%20}"
@@ -276,4 +323,5 @@ function urlencode() {
 if [ -n "$1" ]; then
     clear
     menu_loop "$1"
+    exit 0
 fi

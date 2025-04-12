@@ -18,7 +18,7 @@ function get_options() {
 
     # get the list of options from the menu file
     local options
-    options=$(yq "$menu_path | keys | .[]" "$menu_filename" 2> /dev/null) && {
+    options=$(yq "$menu_path | keys | .[]" "$menu_filename" 2>/dev/null) && {
         # remove __cmd__ from options if it is there
         options=$(echo "$options" | grep -v '__cmd__')
 
@@ -57,4 +57,28 @@ function append_options_navigation() {
     fi
 
     echo "$options"
+}
+
+# find the position of an option in a list
+function get_option_position() {
+    local menu_filename
+    menu_filename=$1
+    local menu_path
+    menu_path=$2
+    local option
+    option=$3
+
+    local options
+    options=$(get_options "$menu_filename" "$menu_path")
+    options=$(echo $options | tr -d '[:cntrl:]')
+    read -a options <<<"$options"
+    local position
+    position=1
+    for opt in "${options[@]}"; do
+        if [[ "$opt" = "$option" ]]; then
+            echo "$position"
+        fi
+        position=$((position + 1))
+    done
+    echo 1
 }

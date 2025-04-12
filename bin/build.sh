@@ -12,6 +12,7 @@ cat \
     src/cmd.sh \
     src/files.sh \
     src/run.sh \
+    src/button.sh \
     src/utils.sh \
     src/main.sh \
     > var/cat-menu.sh
